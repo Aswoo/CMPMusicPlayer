@@ -1,0 +1,85 @@
+# General
+*.iml
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.orig
+*.class
+*.jar
+*.war
+*.ear
+*.pyc
+.DS_Store
+Thumbs.db
+*.plist
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Kotlin/Native
+.cinterop/
+.kotlin_native/
+build/
+
+# Android Studio
+.idea/
+*.ipr
+*.iws
+.idea/modules.xml
+*.idea/*.iml
+*.idea/modules
+
+# Android
+*.apk
+*.ap_*.keystore
+/output.json
+local.properties
+
+# iOS
+DerivedData/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcworkspace
+xcuserdata/
+*.xccheckout
+*.xcuserstate
+
+# Jetpack Compose Desktop
+out/
+
+# macOS
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# Temporary files
+*.tmp
+*.temp
+
+# Build directories
+/build/
+/bin/
+
+# Environment-specific
+.env
+
+# Kotlin Multiplatform Mobile (KMM) specific
+build/cocoapods/
+Pods/
+

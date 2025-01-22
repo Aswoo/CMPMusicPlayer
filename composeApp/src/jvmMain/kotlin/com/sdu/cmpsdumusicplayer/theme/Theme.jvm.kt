@@ -1,0 +1,7 @@
+package com.sdu.cmpsdumusicplayer.theme
+
+import androidx.compose.runtime.Composable
+
+@Composable
+internal actual fun SystemAppearance(isDark: Boolean) {
+}
