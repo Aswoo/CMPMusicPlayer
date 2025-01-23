@@ -1,5 +1,6 @@
 package com.sdu.cmpsdumusicplayer.dashboard
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,14 +68,15 @@ internal fun Failure(message: String) {
         )
     }
 }
+
 @Composable
 internal fun DashboardView(
     dashboardState: DashboardViewState.Success,
     navigateToDetails: (String) -> Unit
-){
-   Column {
-       TopChartView(dashboardState.topFiftyCharts, navigateToDetails)
-   }
+) {
+    Column(modifier = Modifier.background(Color.Gray)) {
+        TopChartView(dashboardState.topFiftyCharts, navigateToDetails)
+    }
 }
 
 @OptIn(ExperimentalResourceApi::class)
