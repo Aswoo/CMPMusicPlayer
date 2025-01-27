@@ -3,10 +3,12 @@ package com.sdu.cmpsdumusicplayer.decompose
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.slot.ChildSlot
 import com.arkivanov.decompose.router.slot.SlotNavigation
+import com.arkivanov.decompose.router.slot.activate
 import com.arkivanov.decompose.router.slot.childSlot
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
 import com.sdu.cmpsdumusicplayer.network.SpotifyApi
@@ -24,7 +26,7 @@ class MusicRootImpl(
     componentContext: ComponentContext,
     private val dashboardMain: (ComponentContext, (DashboardMainComponent.Output) -> Unit) -> DashboardMainComponent,
     private val chartDetails: (
-        ComponentContext
+        ComponentContext, playlistId: String, playingTrackId: String, chatDetailsInput: SharedFlow<ChartDetailsComponent.Input>, (ChartDetailsComponent.Output) -> Unit
     ) -> ChartDetailsComponent,
 ) : MusicRoot, ComponentContext by componentContext {
 
@@ -55,10 +57,14 @@ class MusicRootImpl(
             )
         },
         chartDetails = {
-            childContext ->
+                       childContext, playlistId, playingTrackId, chartDetailsInput, output ->
             ChartDetailsComponentImpl(
                 componentContext = childContext,
-                spotifyApi = api
+                spotifyApi = api,
+                playlistId = playlistId,
+                output = output,
+                playingTrackId = playingTrackId,
+                chatDetailsInput = chartDetailsInput
             )
         }
     ) {
@@ -71,12 +77,33 @@ class MusicRootImpl(
         Configuration.Dashboard -> MusicRoot.Child.Dashboard(
             dashboardMain(componentContext, ::dashboardOutput)
         )
-
         is Configuration.Details -> MusicRoot.Child.Details(
             chartDetails(
-                componentContext
+                componentContext,
+                configuration.playlistId,
+                currentPlayingTrack,
+                chatDetailsInput,
+                ::detailsOutput
             )
         )
+    }
+    private fun detailsOutput(output: ChartDetailsComponent.Output) {
+        when (output) {
+            is ChartDetailsComponent.Output.GoBack -> navigation.pop()
+            is ChartDetailsComponent.Output.OnPlayAllSelected -> {
+                dialogNavigation.activate(DialogConfig(output.playlist))
+                CoroutineScope(Dispatchers.Default).launch {
+                    musicPlayerInput.emit(PlayerComponent.Input.UpdateTracks(output.playlist))
+                }
+            }
+
+            is ChartDetailsComponent.Output.OnTrackSelected -> {
+                dialogNavigation.activate(DialogConfig(output.playlist, output.trackId))
+                CoroutineScope(Dispatchers.Default).launch {
+                    musicPlayerInput.emit(PlayerComponent.Input.PlayTrack(output.trackId, output.playlist))
+                }
+            }
+        }
     }
 
     private fun dashboardOutput(output: DashboardMainComponent.Output) {

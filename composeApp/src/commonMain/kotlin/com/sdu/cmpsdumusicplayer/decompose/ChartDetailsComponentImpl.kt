@@ -8,16 +8,23 @@ import kotlinx.coroutines.flow.SharedFlow
 
 class ChartDetailsComponentImpl(
     componentContext: ComponentContext,
-    val spotifyApi: SpotifyApi
+    val spotifyApi: SpotifyApi,
+    val playlistId: String,
+    val playingTrackId: String,
+    val chatDetailsInput: SharedFlow<ChartDetailsComponent.Input>,
+    val output: (ChartDetailsComponent.Output) -> Unit,
 ) : ChartDetailsComponent, ComponentContext by componentContext {
     override val viewModel: ChartDetailsViewModel
         get() = instanceKeeper.getOrCreate {
             ChartDetailsViewModel(
-                spotifyApi
+                spotifyApi,
+                playlistId,
+                playingTrackId,
+                chatDetailsInput
             )
         }
 
     override fun onOutPut(output: ChartDetailsComponent.Output) {
-
+        output(output)
     }
 }

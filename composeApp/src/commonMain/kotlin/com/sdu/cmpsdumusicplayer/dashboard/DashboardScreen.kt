@@ -2,15 +2,26 @@ package com.sdu.cmpsdumusicplayer.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -22,14 +33,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cmpsdumusicplayer.composeapp.generated.resources.Res
 import cmpsdumusicplayer.composeapp.generated.resources.explore_details
+import cmpsdumusicplayer.composeapp.generated.resources.favorite
+import cmpsdumusicplayer.composeapp.generated.resources.featured_playlist
 import cmpsdumusicplayer.composeapp.generated.resources.likes
+import cmpsdumusicplayer.composeapp.generated.resources.new_releases
+import cmpsdumusicplayer.composeapp.generated.resources.tracks
+import coil3.compose.AsyncImage
 import com.sdu.cmpsdumusicplayer.network.models.topfiftycharts.TopFiftyCharts
 import com.sdu.cmpsdumusicplayer.decompose.DashboardMainComponent
+import com.sdu.cmpsdumusicplayer.network.models.featuredplaylist.FeaturedPlayList
+import com.sdu.cmpsdumusicplayer.network.models.newreleases.NewReleasedAlbums
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 
@@ -74,8 +93,15 @@ internal fun DashboardView(
     dashboardState: DashboardViewState.Success,
     navigateToDetails: (String) -> Unit
 ) {
-    Column(modifier = Modifier.background(Color.Gray)) {
+    val listState = rememberScrollState()
+    Column(
+        modifier = Modifier.background(color = Color(0xFF1D2123)).fillMaxSize()
+            .verticalScroll(listState)
+            .padding(bottom = 32.dp)
+    ) {
         TopChartView(dashboardState.topFiftyCharts, navigateToDetails)
+        FeaturedPlayLists(dashboardState.featuredPlayList, navigateToDetails)
+        NewReleases(dashboardState.newReleasedAlbums, navigateToDetails)
     }
 }
 
@@ -87,15 +113,6 @@ internal fun TopChartView(topFiftyCharts: TopFiftyCharts, navigateToDetails: (St
             .clip(RoundedCornerShape(20.dp))
             .padding(24.dp).clickable(onClick = { navigateToDetails(topFiftyCharts.id.orEmpty()) })
     ) {
-//        val painter = rememberAsyncImagePainter(
-//            topFiftyCharts.images?.first()?.url.orEmpty()
-//        )
-//        Image(
-//            painter,
-//            topFiftyCharts.images?.first()?.url.orEmpty(),
-//            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(20.dp)),
-//            contentScale = ContentScale.Crop
-//        )
         Column(modifier = Modifier.padding(16.dp).align(Alignment.BottomStart)) {
             Text(
                 topFiftyCharts.name.orEmpty(),
@@ -123,6 +140,142 @@ internal fun TopChartView(topFiftyCharts: TopFiftyCharts, navigateToDetails: (St
                     color = Color.White,
                     modifier = Modifier.padding(start = 16.dp)
                 )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun FeaturedPlayLists(
+    featuredPlayList: FeaturedPlayList,
+    navigateToDetails: (String) -> Unit
+) {
+    Column(modifier = Modifier.padding(top = 46.dp)) {
+        Text(
+            stringResource(Res.string.featured_playlist),
+            style = MaterialTheme.typography.headlineLarge.copy(
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFEFEEE0)
+            ),
+            modifier = Modifier.padding(start = 16.dp)
+        )
+        val listState = rememberLazyListState()
+
+        LazyRow(
+            modifier = Modifier.padding(top = 16.dp).fillMaxSize(),
+            state = listState,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp)
+        ) {
+            items(items = featuredPlayList.playlists?.items ?: emptyList()) { playList ->
+                Box(
+                    modifier = Modifier.width(232.dp).clip(RoundedCornerShape(20.dp))
+                        .background(Color(0xFF1A1E1F))
+                        .clickable(onClick = { navigateToDetails(playList.id.orEmpty()) })
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        val model = playList.images?.first()?.url.orEmpty()
+                        AsyncImage(
+                            model = model,
+                            playList.images?.first()?.url.orEmpty(),
+                            modifier = Modifier.clip(RoundedCornerShape(20.dp)).width(100.dp)
+                                .height(100.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                        Text(
+                            text = playList.name.orEmpty(),
+                            style = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
+                            modifier = Modifier.padding(top = 16.dp),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = playList.description.orEmpty(),
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = Color.White.copy(
+                                    alpha = 0.5f
+                                )
+                            ),
+                            modifier = Modifier.padding(top = 8.dp),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = "${(playList.tracks?.total ?: 0)} ${stringResource(Res.string.tracks)}",
+                            style = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
+                            modifier = Modifier.padding(top = 24.dp)
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        tint = Color(0xFFFACD66),
+                        contentDescription = stringResource(Res.string.favorite),
+                        modifier = Modifier.padding(top = 16.dp, end = 16.dp).size(30.dp)
+                            .align(Alignment.TopEnd)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+internal fun NewReleases(
+    newReleasedAlbums: NewReleasedAlbums,
+    navigateToDetails: (String) -> Unit
+) {
+    Column(modifier = Modifier.padding(top = 46.dp).fillMaxWidth()) {
+        Text(
+            stringResource(Res.string.new_releases),
+            style = MaterialTheme.typography.headlineLarge.copy(
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFEFEEE0)
+            ),
+            modifier = Modifier.padding(start = 16.dp)
+        )
+        val listState = rememberLazyListState()
+
+        LazyRow(
+            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+            state = listState,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
+        ) {
+            items(items = newReleasedAlbums.albums?.items ?: emptyList()) { album ->
+                Box(Modifier.width(153.dp)) {
+                    Column {
+                        val model =  album.images?.first()?.url.orEmpty()
+                        AsyncImage(
+                            model = model,
+                            album.images?.first()?.url.orEmpty(),
+                            modifier = Modifier.width(153.dp).height(153.dp)
+                                .clip(RoundedCornerShape(20.dp))
+                                .clickable(onClick = { navigateToDetails(album.id.orEmpty()) }),
+                            contentScale = ContentScale.Crop
+                        )
+                        Text(
+                            text = album.name.orEmpty(),
+                            style = MaterialTheme.typography.displayMedium.copy(color = Color.White),
+                            modifier = Modifier.padding(top = 16.dp),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = "${(album.totalTracks ?: 0)} ${stringResource(Res.string.tracks)}",
+                            style = MaterialTheme.typography.displayMedium.copy(
+                                color = Color.White.copy(
+                                    alpha = 0.5f
+                                )
+                            ),
+                            modifier = Modifier.padding(top = 8.dp),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1
+                        )
+                    }
+                }
             }
         }
     }

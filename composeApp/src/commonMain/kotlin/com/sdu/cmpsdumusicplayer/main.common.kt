@@ -8,6 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
+import com.sdu.cmpsdumusicplayer.chartdetails.ChartDetailsScreen
 import com.sdu.cmpsdumusicplayer.dashboard.DashboardScreen
 import com.sdu.cmpsdumusicplayer.decompose.MusicRoot
 import com.sdu.cmpsdumusicplayer.theme.AppTheme
@@ -28,19 +29,20 @@ internal fun MainCommon(
                     when (val child = it.instance) {
                         is MusicRoot.Child.Dashboard -> {
                             DashboardScreen(child.dashboardMainComponent)
+
                         }
 
                         is MusicRoot.Child.Details -> {
-
+                            ChartDetailsScreen(child.detailsComponent)
                         }
                     }
                 }
             }
-            Box(modifier = Modifier.align(Alignment.BottomEnd)) {
-                dialogOverlay.child?.instance?.also {
+//            Box(modifier = Modifier.align(Alignment.BottomEnd)) {
+//                dialogOverlay.child?.instance?.also {
 //                    PlayerView(it)
-                }
-            }
+//                }
+//            }
         }
     }
 }
