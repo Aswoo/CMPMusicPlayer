@@ -12,7 +12,8 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
 import com.sdu.cmpsdumusicplayer.network.SpotifyApi
-import com.sdu.cmpsdumusicplayer.network.models.featuredplaylist.Item
+import com.sdu.cmpsdumusicplayer.network.models.topfiftycharts.Item
+import com.sdu.cmpsdumusicplayer.player.MediaPlayerController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,6 +25,7 @@ import kotlinx.serialization.serializer
 
 class MusicRootImpl(
     componentContext: ComponentContext,
+    private val mediaPlayerController: MediaPlayerController,
     private val dashboardMain: (ComponentContext, (DashboardMainComponent.Output) -> Unit) -> DashboardMainComponent,
     private val chartDetails: (
         ComponentContext, playlistId: String, playingTrackId: String, chatDetailsInput: SharedFlow<ChartDetailsComponent.Input>, (ChartDetailsComponent.Output) -> Unit
@@ -49,8 +51,10 @@ class MusicRootImpl(
     constructor(
         componentContext: ComponentContext,
         api: SpotifyApi,
+        mediaPlayerController: MediaPlayerController
     ) : this(
         componentContext = componentContext,
+        mediaPlayerController = mediaPlayerController,
         dashboardMain = { childContext, output ->
             DashboardMainComponentImpl(
                 componentContext = childContext, spotifyApi = api, output = output
@@ -122,7 +126,25 @@ class MusicRootImpl(
         key = "PlayerView",
         handleBackButton = true,
         childFactory = { config, _ ->
+            PlayerComponentImpl(
+                componentContext = componentContext,
+                mediaPlayerController = mediaPlayerController,
+                trackList = config.playlist,
+                selectedTrack = config.selectedTrack,
+                playerInputs = musicPlayerInput,
+                output = {
+                    when (it) {
+                        PlayerComponent.Output.OnPause -> TODO()
+                        PlayerComponent.Output.OnPlay -> TODO()
 
+                        is PlayerComponent.Output.OnTrackUpdated -> {
+                            CoroutineScope(Dispatchers.Default).launch {
+                                currentPlayingTrack = it.trackId
+                                chatDetailsInput.emit(ChartDetailsComponent.Input.TrackUpdated(it.trackId))
+                            }
+                        }
+                    }
+                })
         })
 
 
@@ -130,7 +152,7 @@ class MusicRootImpl(
     override val childStack: Value<ChildStack<*, MusicRoot.Child>>
         get() = value()
 
-    override val dialogOverlay: Value<ChildSlot<DialogConfig, Unit>>
+    override val dialogOverlay: Value<ChildSlot<*, PlayerComponent>>
         get() = player
 
     private fun value() = stack

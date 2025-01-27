@@ -1,7 +1,7 @@
 package com.sdu.cmpsdumusicplayer.decompose
 
 import com.sdu.cmpsdumusicplayer.chartdetails.ChartDetailsViewModel
-import com.sdu.cmpsdumusicplayer.network.models.featuredplaylist.Item
+import com.sdu.cmpsdumusicplayer.network.models.topfiftycharts.Item
 import kotlinx.serialization.Serializable
 
 

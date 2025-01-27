@@ -1,9 +1,11 @@
 package com.sdu.cmpsdumusicplayer.decompose
 
-import com.sdu.cmpsdumusicplayer.network.models.featuredplaylist.Item
+import com.sdu.cmpsdumusicplayer.network.models.topfiftycharts.Item
+import musicapp.playerview.PlayerViewModel
+
 
 interface PlayerComponent {
-//    val viewModel: PlayerViewModel
+    val viewModel: PlayerViewModel
 
     fun onOutPut(output: Output)
 

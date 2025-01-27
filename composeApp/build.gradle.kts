@@ -16,8 +16,7 @@ kotlin {
         //https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-test.html
         instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
     }
-
-    jvm()
+    jvm("desktop")
 
     listOf(
         iosX64(),
@@ -31,6 +30,7 @@ kotlin {
     }
 
     sourceSets {
+        val desktopMain by getting
         commonMain.dependencies {
             with(compose) {
                 implementation(ui)
@@ -74,6 +74,12 @@ kotlin {
             implementation(libs.androidx.activityCompose)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
+
+            implementation(libs.androidx.media3.exoplayer)
+        }
+        desktopMain.dependencies {
+            implementation(compose.desktop.common)
+            implementation(libs.vlcj)
         }
 
         jvmMain.dependencies {

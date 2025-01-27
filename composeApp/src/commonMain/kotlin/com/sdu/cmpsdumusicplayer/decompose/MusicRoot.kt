@@ -7,7 +7,7 @@ import com.arkivanov.decompose.value.Value
 interface MusicRoot {
 
     val childStack: Value<ChildStack<*, Child>>
-    val dialogOverlay: Value<ChildSlot<MusicRootImpl.DialogConfig, Unit>>
+    val dialogOverlay: Value<ChildSlot<*, PlayerComponent>>
 
     sealed class Child {
         data class Dashboard(val dashboardMainComponent: DashboardMainComponent) : Child()

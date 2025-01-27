@@ -11,6 +11,7 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.sdu.cmpsdumusicplayer.chartdetails.ChartDetailsScreen
 import com.sdu.cmpsdumusicplayer.dashboard.DashboardScreen
 import com.sdu.cmpsdumusicplayer.decompose.MusicRoot
+import com.sdu.cmpsdumusicplayer.playerview.PlayerView
 import com.sdu.cmpsdumusicplayer.theme.AppTheme
 
 @Composable
@@ -38,11 +39,11 @@ internal fun MainCommon(
                     }
                 }
             }
-//            Box(modifier = Modifier.align(Alignment.BottomEnd)) {
-//                dialogOverlay.child?.instance?.also {
-//                    PlayerView(it)
-//                }
-//            }
+            Box(modifier = Modifier.align(Alignment.BottomEnd)) {
+                dialogOverlay.child?.instance?.also {
+                    PlayerView(it)
+                }
+            }
         }
     }
 }
