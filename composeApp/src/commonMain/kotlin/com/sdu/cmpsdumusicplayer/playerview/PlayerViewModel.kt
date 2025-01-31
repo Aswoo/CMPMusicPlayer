@@ -17,9 +17,6 @@ import kotlinx.coroutines.launch
 import com.sdu.cmpsdumusicplayer.player.MediaPlayerController
 
 
-/**
- * Created by abdulbasit on 26/02/2023.
- */
 class PlayerViewModel(
     private val mediaPlayerController: MediaPlayerController,
     trackList: List<Item>,

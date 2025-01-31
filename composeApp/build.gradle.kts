@@ -26,8 +26,18 @@ kotlin {
         it.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            with(libs) {
+                export(bundles.decompose)
+                export(essenty.lifecycle)
+            }
         }
+        it.binaries.withType<org.jetbrains.kotlin.gradle.plugin.mpp.Framework> {
+            baseName = "ComposeApp"
+            linkerOpts.add("-Xbinary=bundleId=com.sdu.cmpsdumusicplayer") // ⚠️ 번들 ID 명시
+        }
+
     }
+
 
     sourceSets {
         val desktopMain by getting
@@ -43,6 +53,7 @@ kotlin {
                 implementation(kotlinx.serialization.json)
                 implementation(bundles.ktor)
                 api(bundles.decompose)
+                implementation(essenty.lifecycle)
             }
             implementation(compose.components.uiToolingPreview)
             implementation(libs.kotlinx.coroutines.core)
@@ -78,15 +89,19 @@ kotlin {
             implementation(libs.androidx.media3.exoplayer)
         }
         desktopMain.dependencies {
+            implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.ktor.client.okhttp)
+            implementation(compose.desktop.currentOs)
             implementation(compose.desktop.common)
             implementation(libs.vlcj)
         }
 
-        jvmMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutines.swing)
-            implementation(libs.ktor.client.okhttp)
-        }
+//        jvmMain.dependencies {
+//            implementation(compose.desktop.currentOs)
+//            implementation(libs.kotlinx.coroutines.swing)
+//            implementation(libs.ktor.client.okhttp)
+//            implementation(libs.vlcj)
+//        }
 
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -119,7 +134,7 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "com.sdu.cmpsdumusicplayer.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

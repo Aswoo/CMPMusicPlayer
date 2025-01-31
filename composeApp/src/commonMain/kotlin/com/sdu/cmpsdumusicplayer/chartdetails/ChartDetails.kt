@@ -66,16 +66,16 @@ internal fun ChartDetailsScreen(
                 chartDetails = resultedState.chartDetails,
                 playingTrackId = resultedState.playingTrackId,
                 onPlayAllClicked = {
-//                    chartDetailsComponent.onOutPut(
-//                        ChartDetailsComponent.Output.OnPlayAllSelected(
-//                            it
-//                        )
-//                    )
+                    chartDetailsComponent.onOutPut(
+                        ChartDetailsComponent.Output.OnPlayAllSelected(
+                            it
+                        )
+                    )
                 },
                 onPlayTrack = { id, list ->
-//                    chartDetailsComponent.onOutPut(
-//                        ChartDetailsComponent.Output.OnTrackSelected(id, list)
-//                    )
+                    chartDetailsComponent.onOutPut(
+                        ChartDetailsComponent.Output.OnTrackSelected(id, list)
+                    )
                 }
             )
     }
