@@ -1,0 +1,124 @@
+package com.sdu.cmpsdumusicplayer.dashboard
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import cmpsdumusicplayer.composeapp.generated.resources.Res
+import cmpsdumusicplayer.composeapp.generated.resources.explore_details
+import cmpsdumusicplayer.composeapp.generated.resources.likes
+import coil3.compose.rememberAsyncImagePainter
+import com.sdu.cmpsdumusicplayer.decompose.DashboardMainComponent
+import com.sdu.cmpsdumusicplayer.network.models.topfiftycharts.TopFiftyCharts
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
+
+
+
+@Composable
+internal fun DashboardScreenLarge(
+    component: DashboardMainComponent,
+) {
+    val state = component.viewModel.dashboardState.collectAsState()
+
+    when (val resultedState = state.value) {
+        is DashboardViewState.Failure -> Failure(resultedState.error)
+        DashboardViewState.Loading -> Loading()
+        is DashboardViewState.Success -> {
+            DashboardViewLarge(
+                resultedState
+            ) { component.onOutPut(DashboardMainComponent.Output.PlaylistSelected(it)) }
+        }
+    }
+}
+
+@Composable
+internal fun DashboardViewLarge(
+    dashboardState: DashboardViewState.Success, navigateToDetails: (String) -> Unit
+) {
+    val listState = rememberScrollState()
+    Column(
+        modifier = Modifier.background(color = Color(0xFF1D2123)).fillMaxSize()
+            .verticalScroll(listState).padding(bottom = 32.dp)
+    ) {
+        TopChartViewLarge(dashboardState.topFiftyCharts, navigateToDetails)
+        FeaturedPlayLists(dashboardState.featuredPlayList, navigateToDetails)
+        NewReleases(dashboardState.newReleasedAlbums, navigateToDetails)
+    }
+}
+
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+internal fun TopChartViewLarge(
+    topFiftyCharts: TopFiftyCharts, navigateToDetails: (String) -> Unit
+) {
+    Box(
+        modifier = Modifier.clip(RoundedCornerShape(20.dp)).width(686.dp).height(450.dp)
+            .padding(24.dp).clickable(onClick = { navigateToDetails(topFiftyCharts.id.orEmpty()) })
+    ) {
+        val painter = rememberAsyncImagePainter(topFiftyCharts.images?.first()?.url.orEmpty())
+        Image(
+            painter,
+            topFiftyCharts.images?.first()?.url.orEmpty(),
+            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(20.dp)),
+            contentScale = ContentScale.Crop
+        )
+        Column(modifier = Modifier.padding(16.dp).align(Alignment.BottomStart)) {
+            Text(
+                topFiftyCharts.name.orEmpty(),
+                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                color = Color.White
+            )
+            Text(
+                topFiftyCharts.description.orEmpty(),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White,
+                modifier = Modifier.padding(top = 6.dp)
+            )
+            Row(modifier = Modifier.padding(top = 40.dp)) {
+                Icon(
+                    imageVector = Icons.Filled.FavoriteBorder,
+                    tint = Color(0xFFFACD66),
+                    contentDescription = stringResource(Res.string.explore_details),
+                    modifier = Modifier.size(30.dp).align(Alignment.Top)
+                )
+                Text(
+                    text = "${topFiftyCharts.followers?.total ?: 0} ${stringResource(Res.string.likes)}",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Color.White,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+            }
+        }
+    }
+}
+
+

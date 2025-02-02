@@ -9,7 +9,9 @@ import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.sdu.cmpsdumusicplayer.chartdetails.ChartDetailsScreen
+import com.sdu.cmpsdumusicplayer.chartdetails.ChartDetailsScreenLarge
 import com.sdu.cmpsdumusicplayer.dashboard.DashboardScreen
+import com.sdu.cmpsdumusicplayer.dashboard.DashboardScreenLarge
 import com.sdu.cmpsdumusicplayer.decompose.MusicRoot
 import com.sdu.cmpsdumusicplayer.playerview.PlayerView
 import com.sdu.cmpsdumusicplayer.theme.AppTheme
@@ -29,12 +31,17 @@ internal fun MainCommon(
                 ) {
                     when (val child = it.instance) {
                         is MusicRoot.Child.Dashboard -> {
-                            DashboardScreen(child.dashboardMainComponent)
-
+                            if (isLargeScreen)
+                                DashboardScreenLarge(child.dashboardMainComponent)
+                            else
+                                DashboardScreen(child.dashboardMainComponent)
                         }
 
                         is MusicRoot.Child.Details -> {
-                            ChartDetailsScreen(child.detailsComponent)
+                            if (isLargeScreen)
+                                ChartDetailsScreenLarge(child.detailsComponent)
+                            else
+                                ChartDetailsScreen(child.detailsComponent)
                         }
                     }
                 }

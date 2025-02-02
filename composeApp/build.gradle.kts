@@ -31,10 +31,6 @@ kotlin {
                 export(essenty.lifecycle)
             }
         }
-        it.binaries.withType<org.jetbrains.kotlin.gradle.plugin.mpp.Framework> {
-            baseName = "ComposeApp"
-            linkerOpts.add("-Xbinary=bundleId=com.sdu.cmpsdumusicplayer") // ⚠️ 번들 ID 명시
-        }
 
     }
 
